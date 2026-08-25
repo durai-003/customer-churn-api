@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from app.models.schemas import PredictionInput
 
 import joblib
 import pandas as pd
@@ -22,13 +23,13 @@ def root():
     return {"message": "ML API is alive"}
 
 @app.post("/predict")
-def predict():
+def predict(data: PredictionInput):
     sample = pd.DataFrame([{
-        "tenure": 12,
-        "Contract": "Month-to-month",
-        "InternetService": "Fiber optic",
-        "MonthlyCharges": 80.50,
-        "TotalCharges": 966.00
+        "tenure": data.tenure,
+        "Contract": data.Contract,
+        "InternetService": data.InternetService,
+        "MonthlyCharges": data.MonthlyCharges,
+        "TotalCharges": data.TotalCharges
     }])
 
     prediction = model.predict(sample)
