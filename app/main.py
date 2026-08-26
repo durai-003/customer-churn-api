@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from app.models.schemas import PredictionInput
 
+import uuid
 import joblib
 import pandas as pd
 from fastapi import FastAPI
@@ -36,4 +37,18 @@ def predict(data: PredictionInput):
 
     result = "Yes" if prediction[0] == 1 else "No"
 
-    return {"prediction": result}
+    probabilities = model.predict_proba(sample)
+    confidence = float(max(probabilities[0]))
+    request_id = str(uuid.uuid4())
+
+    return {
+    "prediction": result,
+    "confidence": confidence,
+    "request_id": request_id
+}
+@app.get("/health")
+def health():
+    return {
+        "status": "ok",
+        "model_loaded": model is not None
+    }
