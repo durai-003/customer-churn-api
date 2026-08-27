@@ -7,3 +7,9 @@ class PredictionInput(BaseModel):
     InternetService: Literal["DSL","Fiber optic","No"]
     MonthlyCharges: float = Field(..., gt=0, description="Monthly charges must be positive")
     TotalCharges: float = Field(...,ge=0, description="Total charges cannot be negative")
+
+class PredictionOutput(BaseModel):
+    prediction: str
+    confidence: float
+    model_version: str
+    request_id: str
