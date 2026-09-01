@@ -1,0 +1,12 @@
+{
+    "model_type": "Scikit-learn Pipeline",
+    "version": "1.0",
+    "training_date": "2026-08-17",
+    "features": [
+        "tenure",
+        "Contract",
+        "InternetService",
+        "MonthlyCharges",
+        "TotalCharges"
+    ]
+}
