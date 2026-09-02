@@ -7,22 +7,17 @@ from app.models.schemas import (
     ModelInfoOutput
 )
 from app.logging_config import setup_logger
-
+from app.config import settings
 import json
 import joblib
 import pandas as pd
 
 logger = setup_logger()
 router = APIRouter(prefix="/api/v1")
-
 model = None
-
-
 def load_model():
     global model
-    model = joblib.load("ml/saved_model/model.joblib")
-
-
+    model = joblib.load(settings.MODEL_PATH)
 @router.post("/predict", response_model=PredictionOutput)
 def predict(data: PredictionInput, request: Request):
     sample = pd.DataFrame([{
@@ -32,29 +27,23 @@ def predict(data: PredictionInput, request: Request):
         "MonthlyCharges": data.MonthlyCharges,
         "TotalCharges": data.TotalCharges
     }])
-
     try:
         prediction = model.predict(sample)
         result = "Yes" if prediction[0] == 1 else "No"
-
         probabilities = model.predict_proba(sample)
         confidence = float(max(probabilities[0]))
-
     except Exception as e:
         raise HTTPException(
             status_code=500,
             detail="Prediction failed"
         )
-
     request_id = request.state.request_id
-
     return {
         "prediction": result,
         "confidence": confidence,
         "model_version": "1.0",
         "request_id": request_id
     }
-
 @router.post("/predict-batch", response_model=PredictionBatchOutput)
 def predict_batch(data: PredictionBatchInput, request: Request):
     samples = pd.DataFrame([
@@ -68,40 +57,36 @@ def predict_batch(data: PredictionBatchInput, request: Request):
         for item in data.inputs
     ])
     batch_size = len(data.inputs)
-
+    if batch_size > settings.MAX_BATCH_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Batch size cannot exceed {settings.MAX_BATCH_SIZE}"
+        )
     logger.info(
         f"batch_prediction_started request_id={request.state.request_id} "
         f"batch_size={batch_size}"
     )
-
     try:
         predictions = model.predict(samples)
         probabilities = model.predict_proba(samples)
-
         request_id = request.state.request_id
-
         results = []
-
         for index in range(len(data.inputs)):
             result = "Yes" if predictions[index] == 1 else "No"
             confidence = float(max(probabilities[index]))
-
             results.append({
                 "prediction": result,
                 "confidence": confidence,
                 "model_version": "1.0",
                 "request_id": request_id
             })
-
         logger.info(
             f"batch_prediction_success request_id={request_id} "
             f"batch_size={batch_size}"
         )
-
         return {
             "predictions": results
         }
-
     except Exception as e:
         logger.error(
             f"batch_prediction_failed "
@@ -113,14 +98,11 @@ def predict_batch(data: PredictionBatchInput, request: Request):
             status_code=500,
             detail="Batch prediction failed"
        )
-
 @router.get("/model-info", response_model=ModelInfoOutput)
 def model_info():
     with open("ml/saved_model/model_info.json", "r") as file:
         metadata = json.load(file)
-
     return metadata
-
 @router.get("/health")
 def health():
     return {

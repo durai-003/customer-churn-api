@@ -1,8 +1,7 @@
 from contextlib import asynccontextmanager
-
+from app.config import settings
 from app.logging_config import setup_logger
 from app.routers.v1 import router as v1_router, load_model
-
 from fastapi.responses import JSONResponse
 from fastapi import FastAPI, Request
 
@@ -20,7 +19,10 @@ async def lifespan(app: FastAPI):
     logger.info("ML model loaded successfully.")
 
     yield
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title=settings.API_TITLE,
+    lifespan=lifespan
+)
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
