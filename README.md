@@ -74,3 +74,46 @@ Client → FastAPI → Validation → ML Model → Prediction → Logging → Re
 * Git
 * Docker
 * VS Code
+
+## How to Run This Project
+
+### Prerequisites
+
+* Docker Desktop
+
+### Run with Docker Compose
+
+Start the API using:
+
+    docker compose up --build
+
+The API will be available at:
+
+http://localhost:8000
+
+Swagger API documentation:
+
+http://localhost:8000/docs
+
+### Stop the Application
+
+Press Ctrl + C in the terminal running Docker Compose.
+
+To stop and remove the Compose containers and network:
+
+    docker compose down
+
+### Environment Configuration
+
+Environment variables are loaded from the .env file using Docker Compose.
+
+The .env file should contain:
+
+    MODEL_PATH=ml/saved_model/model.joblib
+    LOG_LEVEL=INFO
+    MAX_BATCH_SIZE=100
+    API_TITLE=Customer Churn Prediction API
+
+### Model Volume
+
+The ml/saved_model/ directory is mounted through a named Docker volume. This allows the model files to be managed separately from the application image, so a retrained model can be updated without rebuilding the entire application image.
