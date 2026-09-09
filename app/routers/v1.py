@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, Depends
+from app.security import verify_api_key
 from app.models.schemas import (
     PredictionInput,
     PredictionOutput,
@@ -19,7 +20,11 @@ def load_model():
     global model
     model = joblib.load(settings.MODEL_PATH)
 @router.post("/predict", response_model=PredictionOutput)
-def predict(data: PredictionInput, request: Request):
+def predict(
+    data: PredictionInput,
+    request: Request,
+    api_key: str = Depends(verify_api_key)
+):
     sample = pd.DataFrame([{
         "tenure": data.tenure,
         "Contract": data.Contract,
@@ -45,7 +50,8 @@ def predict(data: PredictionInput, request: Request):
         "request_id": request_id
     }
 @router.post("/predict-batch", response_model=PredictionBatchOutput)
-def predict_batch(data: PredictionBatchInput, request: Request):
+def predict_batch(data: PredictionBatchInput, request: Request,api_key: str = Depends(verify_api_key)
+):
     samples = pd.DataFrame([
         {
             "tenure": item.tenure,
@@ -99,12 +105,14 @@ def predict_batch(data: PredictionBatchInput, request: Request):
             detail="Batch prediction failed"
        )
 @router.get("/model-info", response_model=ModelInfoOutput)
-def model_info():
+def model_info(api_key: str = Depends(verify_api_key)
+):
     with open("ml/saved_model/model_info.json", "r") as file:
         metadata = json.load(file)
     return metadata
 @router.get("/health")
-def health():
+def health(api_key: str = Depends(verify_api_key)
+):
     return {
         "status": "ok",
         "model_loaded": model is not None
@@ -114,4 +122,4 @@ def health():
 # If a future /api/v2/predict needs to return extra fields,
 # I will create a separate v2 router and separate Pydantic response schema.
 # The existing v1 schema and endpoint will remain unchanged
-# so existing clients are not broken.
+# so existing clients are not broken.   

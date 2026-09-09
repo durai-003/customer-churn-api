@@ -1,7 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Literal, List
 
 class PredictionInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     tenure: int = Field(
         ...,
         ge=0,
@@ -22,19 +24,25 @@ class PredictionInput(BaseModel):
     )
 
 class PredictionOutput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     prediction: str
     confidence: float
     model_version: str
     request_id: str
 
 class PredictionV2Output(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     prediction: str
     confidence: float
     probabilities: dict[str, float]
     model_version: str
     request_id: str
-    
+
 class PredictionBatchInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     inputs: List[PredictionInput] = Field(
         ...,
         min_length=1,
@@ -42,10 +50,13 @@ class PredictionBatchInput(BaseModel):
     )
 
 class PredictionBatchOutput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     predictions: List[PredictionOutput]
 
-
 class ModelInfoOutput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     model_type: str
     version: str
     training_date: str

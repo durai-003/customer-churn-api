@@ -5,6 +5,7 @@ from app.routers.v1 import router as v1_router, load_model
 from app.routers.v2 import router as v2_router, load_model as load_model_v2
 from fastapi.responses import JSONResponse
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 
 import uuid
 import time
@@ -24,6 +25,14 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.API_TITLE,
     lifespan=lifespan
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["X-API-Key", "Content-Type"],
 )
 
 @app.middleware("http")

@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, Depends
+from app.security import verify_api_key
 from app.models.schemas import PredictionInput, PredictionV2Output
 from app.config import settings
 import joblib
@@ -11,7 +12,11 @@ def load_model():
     model = joblib.load(settings.MODEL_PATH)
 
 @router.post("/predict", response_model=PredictionV2Output)
-def predict_v2(data: PredictionInput, request: Request):
+def predict_v2(
+    data: PredictionInput,
+    request: Request,
+    api_key: str = Depends(verify_api_key)
+):
     sample = pd.DataFrame([{
         "tenure": data.tenure,
         "Contract": data.Contract,
