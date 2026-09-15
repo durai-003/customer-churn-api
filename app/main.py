@@ -6,6 +6,7 @@ from app.routers.v2 import router as v2_router, load_model as load_model_v2
 from fastapi.responses import JSONResponse
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 
 import uuid
 import time
@@ -14,7 +15,6 @@ class PredictionError(Exception):
     pass
 
 logger = setup_logger()
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     load_model()
@@ -26,7 +26,7 @@ app = FastAPI(
     title=settings.API_TITLE,
     lifespan=lifespan
 )
-
+Instrumentator().instrument(app).expose(app)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -34,7 +34,6 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["X-API-Key", "Content-Type"],
 )
-
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     request_id = str(uuid.uuid4())
@@ -55,11 +54,9 @@ async def prediction_error_handler(request, exc):
         status_code=500,
         content={"detail": "Prediction failed"}
     )
-
 @app.get("/")
 def root():
     return {"message": "ML API is alive"}
-
 app.include_router(v1_router)
 app.include_router(v2_router)
 

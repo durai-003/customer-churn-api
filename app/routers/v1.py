@@ -8,6 +8,7 @@ from app.models.schemas import (
     ModelInfoOutput
 )
 from app.logging_config import setup_logger
+from app.metrics import churn_predictions_total
 from app.config import settings
 import json
 import joblib
@@ -35,6 +36,7 @@ def predict(
     try:
         prediction = model.predict(sample)
         result = "Yes" if prediction[0] == 1 else "No"
+        churn_predictions_total.labels(prediction=result).inc()
         probabilities = model.predict_proba(sample)
         confidence = float(max(probabilities[0]))
     except Exception as e:
