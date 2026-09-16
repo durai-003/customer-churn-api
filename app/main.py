@@ -57,6 +57,9 @@ async def prediction_error_handler(request, exc):
 @app.get("/")
 def root():
     return {"message": "ML API is alive"}
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
 app.include_router(v1_router)
 app.include_router(v2_router)
 
