@@ -3,7 +3,6 @@ from app.config import settings
 from app.logging_config import setup_logger
 from app.routers.v1 import router as v1_router, load_model
 from app.routers.v2 import router as v2_router, load_model as load_model_v2
-from fastapi.responses import JSONResponse
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
