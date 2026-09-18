@@ -538,6 +538,19 @@ http://localhost:8000/docs
 
 The API can then be tested using Swagger UI or the documented curl commands.
 
+## Live Deployment
+
+The API is deployed on Render.
+
+Live API:
+https://customer-churn-api-oki7.onrender.com
+
+Swagger UI:
+https://customer-churn-api-oki7.onrender.com/docs
+
+Health Check:
+https://customer-churn-api-oki7.onrender.com/health
+
 ## Final Project Checklist
  Machine learning model trained
  Model saved using Joblib
@@ -556,3 +569,4 @@ The API can then be tested using Swagger UI or the documented curl commands.
  Docker Compose support added
  Project dependencies cleaned
  README documentation completed
+ GitHub Actions CI workflow implemented
