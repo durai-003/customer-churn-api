@@ -453,22 +453,22 @@ API v2 provides additional probability information.
 Keeping separate API versions allows the API to evolve while maintaining the existing v1 endpoint structure.
 
 ## Independent Extension
-GitHub Actions Automated Testing
 
-As an independent extension, GitHub Actions can be used to automatically run the Pytest test suite whenever code is pushed to the repository.
+### GitHub Actions Automated Testing
 
-The purpose of this extension is to automatically check whether new changes pass the existing tests.
+As an independent extension, GitHub Actions was implemented to automatically run the Pytest test suite whenever code is pushed to the repository or a pull request is created.
 
-The workflow can be configured to:
+The workflow performs the following steps:
 
-Check out the repository.
-Set up Python.
-Install the project dependencies.
-Run Pytest.
-Report the test result.
+- Check out the repository.
+- Set up Python 3.14.
+- Install the project dependencies.
+- Run the Pytest test suite.
+- Report the test result.
 
-This provides an automated quality check for future changes.
+This provides an automated quality check for future code changes and helps ensure that existing functionality continues to pass the test suite.
 
+The GitHub Actions workflow completed successfully with all tests passing.
 ## What I Learned
 
 During this project, I learned how to:
